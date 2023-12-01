@@ -4,17 +4,22 @@ from dataclasses import dataclass, field
 from typing import Optional
 import torch
 
-
+model_dir = "F:\Models\ChatGLM-3\chatglm3-6b-base"
+data_path = "D:\\GitRep\\chatglm3-base-tuning\\formatted_samples.json"
+data_path = {"train":["D:\\GitRep\\data_maker\\from_books\\被讨厌的勇气QA提取\\被讨厌的勇气QA.json",
+                      "D:\\GitRep\\data_maker\\from_books\\重新定义自己-数据提取\\重新定义自己QA.json"],
+             "validation":["D:\\GitRep\\data_maker\\from_books\\被讨厌的勇气QA提取\\被讨厌的勇气QA.json",
+                      "D:\\GitRep\\data_maker\\from_books\\重新定义自己-数据提取\\重新定义自己QA.json"]}
 @dataclass
 class TrainingConfig:
-    model_name: str = field(default="./chatglm3-6b-base", metadata={"help": 'Huggingface Name of the model you want to train'})
+    model_name: str = field(default=model_dir, metadata={"help": 'Huggingface Name of the model you want to train'})
     data_path: str = field(default="formatted_samples.json", metadata={"help": 'Path towards your training data'})
-    output_dir: str = field(default='./trained_model', metadata={"help": 'The output dir for logs and checkpoints'})
+    output_dir: str = field(default='./try-train-chatglm3-4-qafrombooks', metadata={"help": 'The output dir for logs and checkpoints'})
     training_recipe: str = field(default="lora", metadata={"help": "Lora Training or Full Training"})
     optim: str = field(default='paged_adamw_8bit', metadata={"help": 'The optimizer to be used'})
     batch_size: int = field(default=4, metadata={"help": 'The training batch size per GPU. Increase for better speed.'})
     gradient_accumulation_steps: int = field(default=1, metadata={"help": 'How many gradients to accumulate before to perform an optimizer step'})
-    n_epochs: int = field(default=5, metadata={"help": 'How many optimizer update steps to take'})
+    n_epochs: int = field(default=50, metadata={"help": 'How many optimizer update steps to take'})
     weight_decay: float = field(default=0.0, metadata={"help": 'The L2 weight decay rate of AdamW'}) 
     learning_rate: float = field(default=1e-4, metadata={"help": 'The learning rate'})
     max_grad_norm: float = field(default=0.3, metadata={"help": 'Gradient clipping max norm. This is tuned and works well for all models tested.'})
@@ -25,21 +30,21 @@ class TrainingConfig:
     logging_steps: int = field(default=1, metadata={"help": 'The frequency of update steps after which to log the loss'})
     group_by_length: bool = field(default=True, metadata={"help": 'Group sequences into batches with same length. Saves memory and speeds up training considerably.'})
     save_strategy: str = field(default='epoch', metadata={"help": 'When to save checkpoints'})
-    save_total_limit: int = field(default=3, metadata={"help": 'How many checkpoints to save before the oldest is overwritten'})
+    save_total_limit: int = field(default=5, metadata={"help": 'How many checkpoints to save before the oldest is overwritten'})
     fp16: bool = field(default=False, metadata={"help": 'Whether to use fp16 mixed precision training'})
     tokenizer_type: str = field(default="llama", metadata={"help": "Tokenizer type. Should be \"llama\" for llama models to address tokenizer issue"})
     trust_remote_code: str = field(default=True, metadata={"help": "Whether to trust remote code."})
     compute_dtype: torch.dtype = field(default=torch.float16, metadata={"help":"Compute Datatype for models, either float16 or float32."})
-    max_tokens: int = field(default=4096, metadata={"help":"Max tokens"})
+    max_tokens: int = field(default=3500, metadata={"help":"Max tokens"})
     do_eval: bool = field(default=True, metadata={"help": "Whether to evaluate or not"})
     evaluation_strategy: str = field(default="epoch", metadata={"help": "When to evaluate, after certain number of steps or each epoch"})
     use_auth_token: str = field(default=False, metadata={"help": "auth token"})
     use_fast: bool = field(default=False, metadata={"help": "Whether to use fast tokenizer"})
-    bits: Optional[int] = field(default=4, metadata={"help": "Number of bits to quantize the model to"})
+    bits: Optional[int] = field(default=8, metadata={"help": "Number of bits to quantize the model to"})
     double_quant: bool = field(default=True, metadata={"help": "Compress the quantization statistics through double quantization."})
     quant_type: str = field(default="nf4", metadata={"help": "Quantization data type to use. Should be one of `fp4` or `nf4`."})
     lora_r: int = field(default=64, metadata={"help": "Lora R dimension."})
-    lora_alpha: float = field(default=16, metadata={"help": " Lora alpha."})
+    lora_alpha: float = field(default=32, metadata={"help": " Lora alpha."})
     lora_dropout: float = field(default=0.05, metadata={"help":"Lora dropout."})
 
 

@@ -18,7 +18,7 @@ class DataModule:
     
 def _make_r_io_base(f, mode: str):
     if not isinstance(f, io.IOBase):
-        f = open(f, mode=mode)
+        f = open(f, mode=mode,encoding='utf-8')
     return f
 
 
@@ -76,7 +76,8 @@ class ChatDataModule(DataModule):
         self.data_collator = DataCollatorForChatDataset(tokenizer=tokenizer)
 
 
-def preprocess(conversations: Sequence[Sequence[dict]], tokenizer: transformers.PreTrainedTokenizer, max_tokens=None) -> Dict:
+def preprocess(conversations: Sequence[Sequence[dict]], 
+               tokenizer: transformers.PreTrainedTokenizer, max_tokens=None) -> Dict:
     """
     Preprocess the data by tokenizing.
     """

@@ -6,7 +6,7 @@ import bitsandbytes as bnb
 from dataclasses import dataclass, field
 from typing import Optional, Dict
 from transformers import BitsAndBytesConfig
-from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model
+from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model,TaskType
 from transformers import Trainer
 
 from utils import _get_compute_dtype, print_trainable_parameters
@@ -46,7 +46,9 @@ class ChatGLMEngine:
         capture_event("start-training", {})
 
         if self.config.training_recipe == "lora":
-            self.model = transformers.AutoModelForCausalLM.from_pretrained(
+            from transformers import AutoModel
+            # self.model = transformers.AutoModelForCausalLM.from_pretrained(
+            self.model = AutoModel.from_pretrained(
                 self.model_name,
                 load_in_4bit=self.config.bits == 4,
                 load_in_8bit=self.config.bits == 8,
@@ -90,10 +92,10 @@ class ChatGLMEngine:
             lora_config = LoraConfig(
                 r=self.config.lora_r,
                 lora_alpha=self.config.lora_alpha,
-                target_modules=modules,
+                #target_modules=modules,#报错，尝试让peft自动识别
                 lora_dropout=self.config.lora_dropout,
                 bias="none",
-                task_type="CAUSAL_LM",
+                task_type=TaskType.CAUSAL_LM
             )
             
             self.model = get_peft_model(self.model, lora_config)
